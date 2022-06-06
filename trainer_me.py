@@ -118,7 +118,6 @@ class Trainer():
                            position=0)
         for i,data in batch_iter:
             points, target = data
-            points = points.transpose(2, 1)
             points, target = points.cuda(), target.cuda()
             classifier = self.model.eval()
             pred, _= classifier(points)
