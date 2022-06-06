@@ -39,39 +39,42 @@ class Trainer():
 
 
     def train_one_epoch(self,epoch_num):
-                loss_train = []
+
+                epoch_train_loss = []
                 epoch_train_acc = []
+                batch_number = 0
                 batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
                                 position=0)
-                self.model.train()
-                for i, data in batch_iter:
+                for idx,data in batch_iter:
+                    batch_number += 1
                     points, targets = data
-                    points = points.to(self.device)
-                    targets = targets.to(self.device)
-                    self.optimizer.zero_grad()
+ 
+                    points, targets = points.to(self.device), targets.to(self.device)
+                    if points.shape[0] <= 1:
+                        continue
+                    optimizer.zero_grad()
+                    self.model = self.model.train()
                     preds, feature_transform = self.model(points)
-                    print(preds.shape, targets.shape)
-                    preds = preds.view(-1, self.number_of_classes)
+  
+                    preds = preds.view(-1, train_dataset.NUM_SEGMENTATION_CLASSES)
                     targets = targets.view(-1)
-                    print(preds.shape, targets.shape)
-                    identity = torch.eye(feature_transform.shape[-1],device=self.device)
 
-                    regularization_loss = torch.norm(identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1)))
+                    identity = torch.eye(feature_transform.shape[-1]).to(self.device)
+                    regularization_loss = torch.norm(
+                        identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
+                    )
                     loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
-                    
+                    epoch_train_loss.append(loss.cpu().item())
                     loss.backward()
-                    self.optimizer.step()
-                    loss_train.append(loss.item())
-
+                    optimizer.step()
                     preds = preds.data.max(1)[1]
                     corrects = preds.eq(targets.data).cpu().sum()
-     
 
-                    accuracy = corrects.item() / float(self.train_data_loader.batch_size *2500)
+                    accuracy = corrects.item() / float(batch_size*number_of_points)
                     epoch_train_acc.append(accuracy)
-                    batch_iter.set_description('train loss: %f, train accuracy: %f' % (np.mean(loss_train),np.mean(epoch_train_acc)))
+                    batch_iter.set_description('train loss: %f, train accuracy: %f' % (np.mean(epoch_train_loss),
+                                                                            np.mean(epoch_train_acc)))
 
-                return np.mean(loss_train)
     
 
     
