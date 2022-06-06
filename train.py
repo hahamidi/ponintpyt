@@ -12,6 +12,7 @@ from fastprogress import master_bar, progress_bar
 from datasets import ShapeNetDataset, PointMNISTDataset
 from model.pointnet import ClassificationPointNet, SegmentationPointNet
 from utils import plot_losses, plot_accuracies
+from tqdm import tqdm
 
 
 MODELS = {
