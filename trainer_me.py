@@ -17,8 +17,8 @@ from tqdm import tqdm
 
 class Trainer():
     def __init__(self,model,
-                        data_loader, 
-                        val_loader , 
+                        train_data_loader, 
+                        val_data_loader , 
                         optimizer ,
                         epochs,
                         number_of_classes,
@@ -26,8 +26,8 @@ class Trainer():
                         scheduler,
                         device):
         self.model = model
-        self.data_loader = data_loader
-        self.val_loader = val_loader
+        self.data_loader = train_data_loader
+        self.val_loader = val_data_loader
         self.optimizer = optimizer
         self.epochs = epochs
         self.number_of_classes = number_of_classes
@@ -98,8 +98,8 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 
     trainer = Trainer(model = model,
-                        data_loader = train_dataloader, 
-                        val_loader = test_dataloader, 
+                        train_data_loader = train_dataloader, 
+                        val_data_loader = test_dataloader, 
                         optimizer = optimizer,
                         epochs=args.epochs,
                         number_of_classes = train_dataset.NUM_CLASSIFICATION_CLASSES,
