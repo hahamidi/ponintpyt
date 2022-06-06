@@ -70,7 +70,7 @@ class Trainer():
                     preds = preds.data.max(1)[1]
                     corrects = preds.eq(targets.data).cpu().sum()
 
-                    accuracy = corrects.item() / float(batch_size*number_of_points)
+                    accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
                     epoch_train_acc.append(accuracy)
                     batch_iter.set_description('train loss: %f, train accuracy: %f' % (np.mean(epoch_train_loss),
                                                                             np.mean(epoch_train_acc)))
