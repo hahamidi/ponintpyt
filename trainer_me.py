@@ -48,6 +48,7 @@ class Trainer():
                 for idx,data in batch_iter:
                     batch_number += 1
                     points, targets = data
+                    print(targets)
  
                     points, targets = points.to(self.device), targets.to(self.device)
                     if points.shape[0] <= 1:
@@ -139,6 +140,7 @@ if __name__ == '__main__':
                         loss_function = F.cross_entropy,
                         scheduler = None,
                         device =device)
+    print(train_dataset.NUM_CLASSIFICATION_CLASSES)
     trainer.train_one_epoch(0)
 
 
