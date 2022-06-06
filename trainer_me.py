@@ -146,7 +146,7 @@ if __name__ == '__main__':
                         scheduler = None,
                         device =device)
     print(train_dataset.NUM_SEGMENTATION_CLASSES)
-    trainer.train_one_epoch(0)
+    trainer.train()
 
 
 
