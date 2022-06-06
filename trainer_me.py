@@ -125,7 +125,8 @@ class Trainer():
 
             pred_np = pred_choice.cpu().data.numpy()
             target_np = target.cpu().data.numpy() - 1
-
+            print(pred_np)
+            print(target_np)
             for shape_idx in range(target_np.shape[0]):
                 parts = range(self.number_of_classes)#np.unique(target_np[shape_idx])
                 part_ious = []
