@@ -119,7 +119,7 @@ class Trainer():
                 shape_ious = []
                 batch_iter = tqdm(enumerate(self.val_data_loader), 'Miou on val', total=len(self.val_data_loader),
                                 position=0)
-                m = MeanIoU(self.number_of_classes, name=None, dtype=None).to("cpu")
+                m = MeanIoU(self.number_of_classes, name=None, dtype=None)
                 for i,data in batch_iter:
                     points, target = data
                     points, target = points.cuda(), target.cuda()
