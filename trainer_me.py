@@ -48,7 +48,7 @@ class Trainer():
                 for idx,data in batch_iter:
                     batch_number += 1
                     points, targets = data
-                    print(targets)
+                    # print(targets)
  
                     points, targets = points.to(self.device), targets.to(self.device)
                     if points.shape[0] <= 1:
@@ -75,6 +75,11 @@ class Trainer():
                     epoch_train_acc.append(accuracy)
                     batch_iter.set_description('train loss: %f, train accuracy: %f' % (np.mean(epoch_train_loss),
                                                                             np.mean(epoch_train_acc)))
+    def train(self):
+        for epoch in range(self.epochs):
+            self.train_one_epoch(epoch)
+            # self.scheduler.step()
+            # torch.save(self.model.state_dict(), 'model_%d.pkl' % epoch)
 
     
 
