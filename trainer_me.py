@@ -50,8 +50,8 @@ class Trainer():
                     targets = targets.to(self.device)
                     self.optimizer.zero_grad()
                     preds, feature_transform = self.model(points)
-                    preds = preds.view(-1, self.number_of_classes)
-                    targets = targets.view(-1)
+                    # preds = preds.view(-1, self.number_of_classes)
+                    # targets = targets.view(-1)
                     identity = torch.eye(feature_transform.shape[-1],device=self.device)
 
                     regularization_loss = torch.norm(identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1)))
