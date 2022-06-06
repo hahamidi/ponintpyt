@@ -52,8 +52,8 @@ class Trainer():
                     preds, feature_transform = self.model(points)
                     preds = preds.view(-1, self.number_of_classes)
                     targets = targets.view(-1)
+                    identity = torch.eye(feature_transform.shape[-1],device=self.device)
 
-                    identity = identity.to(self.device)
                     regularization_loss = torch.norm(identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1)))
                     loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
                     
