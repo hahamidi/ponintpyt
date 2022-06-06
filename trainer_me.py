@@ -50,6 +50,7 @@ class Trainer():
                     targets = targets.to(self.device)
                     self.optimizer.zero_grad()
                     preds, feature_transform = self.model(points)
+                    print(preds.shape, targets.shape)
                     # preds = preds.view(-1, self.number_of_classes)
                     # targets = targets.view(-1)
                     identity = torch.eye(feature_transform.shape[-1],device=self.device)
