@@ -124,7 +124,7 @@ class Trainer():
             pred_choice = pred.data.max(2)[1]
 
             pred_np = pred_choice.cpu().data.numpy()
-            target_np = target.cpu().data.numpy() - 1
+            target_np = target.cpu().data.numpy()
             print(pred_np)
             print(target_np)
             for shape_idx in range(target_np.shape[0]):
