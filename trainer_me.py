@@ -26,8 +26,8 @@ class Trainer():
                         scheduler,
                         device):
         self.model = model
-        self.data_loader = train_data_loader
-        self.val_loader = val_data_loader
+        self.train_data_loader = train_data_loader
+        self.val_data_loader = val_data_loader
         self.optimizer = optimizer
         self.epochs = epochs
         self.number_of_classes = number_of_classes
@@ -43,7 +43,19 @@ class Trainer():
                 batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
                                 position=0)
                 for i, data in batch_iter:
-                    print(data)
+                    points, targets = data
+                    points = points.to(self.device)
+                    targets = targets.to(self.device)
+                    self.optimizer.zero_grad()
+                    outputs = self.model(points)
+                    loss = self.loss_function(outputs, targets)
+                    loss.backward()
+                    self.optimizer.step()
+                    loss_train.append(loss.item())
+                    batch_iter.set_description(f'Epoch {epoch_num}')
+                    batch_iter.set_postfix(loss=loss.item())
+                return np.mean(loss_train)
+    
 
     
 
