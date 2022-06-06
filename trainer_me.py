@@ -130,6 +130,8 @@ class Trainer():
                 parts = range(self.number_of_classes)#np.unique(target_np[shape_idx])
                 part_ious = []
                 for part in parts:
+                    print(pred_np[shape_idx])
+                    print(target_np[shape_idx])
                     I = np.sum(np.logical_and(pred_np[shape_idx] == part, target_np[shape_idx] == part))
                     U = np.sum(np.logical_or(pred_np[shape_idx] == part, target_np[shape_idx] == part))
                     print("==>",I , U)
