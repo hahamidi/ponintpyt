@@ -57,7 +57,7 @@ class Trainer():
                     self.model = self.model.train()
                     preds, feature_transform = self.model(points)
   
-                    preds = preds.view(-1, train_dataset.NUM_SEGMENTATION_CLASSES)
+                    preds = preds.view(-1, self.number_of_classes)
                     targets = targets.view(-1)
 
                     identity = torch.eye(feature_transform.shape[-1]).to(self.device)
@@ -136,11 +136,11 @@ if __name__ == '__main__':
                         val_data_loader = test_dataloader, 
                         optimizer = optimizer,
                         epochs=args.epochs,
-                        number_of_classes = train_dataset.NUM_CLASSIFICATION_CLASSES,
+                        number_of_classes = train_dataset.NUM_SEGMENTATION_CLASSES,
                         loss_function = F.cross_entropy,
                         scheduler = None,
                         device =device)
-    print(train_dataset.NUM_CLASSIFICATION_CLASSES)
+    print(train_dataset.NUM_SEGMENTATION_CLASSES)
     trainer.train_one_epoch(0)
 
 
