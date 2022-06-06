@@ -102,7 +102,7 @@ if __name__ == '__main__':
                         val_loader = test_dataloader, 
                         optimizer = optimizer,
                         epochs=args.epochs,
-                        number_of_class = train_dataset.NUM_CLASSIFICATION_CLASSES,
+                        number_of_classes = train_dataset.NUM_CLASSIFICATION_CLASSES,
                         loss_function = F.cross_entropy,
                         scheduler = None,
                         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
