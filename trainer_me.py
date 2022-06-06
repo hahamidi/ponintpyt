@@ -34,6 +34,8 @@ class Trainer():
         self.loss_function = loss_function
         self.scheduler = scheduler
         self.device = device
+        self.blue= lambda x: '\033[94m' + x + '\033[0m'
+        self.red = lambda x: '\033[91m' + x + '\033[0m'
 
 
 
@@ -53,7 +55,7 @@ class Trainer():
                     points, targets = points.to(self.device), targets.to(self.device)
                     if points.shape[0] <= 1:
                         continue
-                    optimizer.zero_grad()
+                    self.optimizer.zero_grad()
                     self.model = self.model.train()
                     preds, feature_transform = self.model(points)
   
@@ -67,14 +69,51 @@ class Trainer():
                     loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
                     epoch_train_loss.append(loss.cpu().item())
                     loss.backward()
-                    optimizer.step()
+                    self.optimizer.step()
                     preds = preds.data.max(1)[1]
                     corrects = preds.eq(targets.data).cpu().sum()
 
                     accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
                     epoch_train_acc.append(accuracy)
-                    batch_iter.set_description('train loss: %f, train accuracy: %f' % (np.mean(epoch_train_loss),
-                                                                            np.mean(epoch_train_acc)))
+                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f' % (np.mean(epoch_train_loss),
+                                                                            np.mean(epoch_train_acc))))
+                                                                        
+    def val_one_epoch(self,epoch_num):
+        epoch_val_loss = []
+        epoch_val_acc = []
+        batch_number = 0
+        batch_iter = tqdm(enumerate(self.val_data_loader), 'Validation', total=len(self.val_data_loader),position=0)
+        self.model = self.model.eval()
+        for idx,data in batch_iter:
+                    batch_number += 1
+                    points, targets = data
+                    # print(targets)
+ 
+                    points, targets = points.to(self.device), targets.to(self.device)
+                    if points.shape[0] <= 1:
+                        continue
+
+                    
+                    preds, feature_transform = self.model(points)
+  
+                    preds = preds.view(-1, self.number_of_classes)
+                    targets = targets.view(-1)
+
+                    identity = torch.eye(feature_transform.shape[-1]).to(self.device)
+                    regularization_loss = torch.norm(
+                        identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
+                    )
+                    loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
+                    epoch_val_loss.append(loss.cpu().item())
+                    preds = preds.data.max(1)[1]
+                    corrects = preds.eq(targets.data).cpu().sum()
+
+                    accuracy = corrects.item() / float(self.val_data_loader.batch_size*2500)
+                    epoch_val_acc.append(accuracy)
+                    batch_iter.set_description('val loss: %f, val accuracy: %f' % (np.mean(epoch_val_loss),
+                                                                            np.mean(epoch_val_acc)))
+
+
     def train(self):
         for epoch in range(self.epochs):
             self.train_one_epoch(epoch)
