@@ -110,13 +110,14 @@ class Trainer():
 
                     accuracy = corrects.item() / float(self.val_data_loader.batch_size*2500)
                     epoch_val_acc.append(accuracy)
-                    batch_iter.set_description('val loss: %f, val accuracy: %f' % (np.mean(epoch_val_loss),
-                                                                            np.mean(epoch_val_acc)))
+                    batch_iter.set_description(self.red('val loss: %f, val accuracy: %f' % (np.mean(epoch_val_loss),
+                                                                            np.mean(epoch_val_acc))))
 
 
     def train(self):
         for epoch in range(self.epochs):
             self.train_one_epoch(epoch)
+            self.val_one_epoch(epoch)
             # self.scheduler.step()
             # torch.save(self.model.state_dict(), 'model_%d.pkl' % epoch)
 
