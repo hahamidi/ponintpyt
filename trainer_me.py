@@ -15,6 +15,8 @@ from model.pointnet import ClassificationPointNet, SegmentationPointNet
 from utils import plot_losses, plot_accuracies
 from tqdm import tqdm
 
+from tensorflow.keras.metrics import MeanIoU
+
 class Trainer():
     def __init__(self,model,
                         train_data_loader, 
@@ -116,6 +118,7 @@ class Trainer():
         shape_ious = []
         batch_iter = tqdm(enumerate(self.val_data_loader), 'Miou on val', total=len(self.val_data_loader),
                            position=0)
+        m = MeanIoU(self.number_of_classes, name=None, dtype=None)
         for i,data in batch_iter:
             points, target = data
             points, target = points.cuda(), target.cuda()
@@ -125,23 +128,10 @@ class Trainer():
 
             pred_np = pred_choice.cpu().data.numpy()
             target_np = target.cpu().data.numpy()
-
-            for shape_idx in range(target_np.shape[0]):
-                parts = range(self.number_of_classes)#np.unique(target_np[shape_idx])
-                part_ious = []
-                for part in parts:
-                    print(pred_np[shape_idx])
-                    print(target_np[shape_idx])
-                    I = np.sum(np.logical_and(pred_np[shape_idx] == part, target_np[shape_idx] == part))
-                    U = np.sum(np.logical_or(pred_np[shape_idx] == part, target_np[shape_idx] == part))
-                    print("==>",I , U)
-                    if U == 0:
-                        iou = 1 #If the union of groundtruth and prediction points is empty, then count part IoU as 1
-                    else:
-                        iou = I / float(U)
-                    print(iou)
-                    part_ious.append(iou)
-                shape_ious.append(np.mean(part_ious))
+            
+            m.update_state(pred_np, target_np)
+            part_ious = m.result().numpy()
+            shape_ious.append(np.mean(part_ious))
         print("Mean IOU: ", np.mean(shape_ious))
         return np.mean(shape_ious)
 
