@@ -40,20 +40,35 @@ class Trainer():
 
     def train_one_epoch(self,epoch_num):
                 loss_train = []
+                epoch_train_acc = []
                 batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
                                 position=0)
+                self.model.train()
                 for i, data in batch_iter:
                     points, targets = data
                     points = points.to(self.device)
                     targets = targets.to(self.device)
                     self.optimizer.zero_grad()
-                    outputs = self.model(points)
-                    loss = self.loss_function(outputs, targets)
+                    preds, feature_transform = self.model(points)
+                    preds = preds.view(-1, self.number_of_classes)
+                    targets = targets.view(-1)
+
+                    identity = identity.to(self.device)
+                    regularization_loss = torch.norm(identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1)))
+                    loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
+                    
                     loss.backward()
                     self.optimizer.step()
                     loss_train.append(loss.item())
-                    batch_iter.set_description(f'Epoch {epoch_num}')
-                    batch_iter.set_postfix(loss=loss.item())
+
+                    preds = preds.data.max(1)[1]
+                    corrects = preds.eq(targets.data).cpu().sum()
+     
+
+                    accuracy = corrects.item() / float(self.train_data_loader.batch_size *2500)
+                    epoch_train_acc.append(accuracy)
+                    batch_iter.set_description('train loss: %f, train accuracy: %f' % (np.mean(loss_train),np.mean(epoch_train_acc)))
+
                 return np.mean(loss_train)
     
 
