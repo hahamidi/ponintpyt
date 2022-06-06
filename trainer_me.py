@@ -108,7 +108,8 @@ if __name__ == '__main__':
     else:
                 raise Exception('Unknown task !')
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
     trainer = Trainer(model = model,
                         train_data_loader = train_dataloader, 
                         val_data_loader = test_dataloader, 
@@ -117,7 +118,7 @@ if __name__ == '__main__':
                         number_of_classes = train_dataset.NUM_CLASSIFICATION_CLASSES,
                         loss_function = F.cross_entropy,
                         scheduler = None,
-                        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+                        device =device)
     trainer.train_one_epoch(0)
 
 
