@@ -145,7 +145,7 @@ class Trainer():
 
     def train(self):
         for epoch in range(self.epochs):
-            self.evaluate_miou(epoch)
+            self.evaluate_miou()
             self.train_one_epoch(epoch)
             self.val_one_epoch(epoch)
             # self.scheduler.step()
