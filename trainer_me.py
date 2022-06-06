@@ -127,7 +127,7 @@ class Trainer():
             target_np = target.cpu().data.numpy() - 1
 
             for shape_idx in range(target_np.shape[0]):
-                parts = range(self.num_classes)#np.unique(target_np[shape_idx])
+                parts = range(self.number_of_classes)#np.unique(target_np[shape_idx])
                 part_ious = []
                 for part in parts:
                     I = np.sum(np.logical_and(pred_np[shape_idx] == part, target_np[shape_idx] == part))
