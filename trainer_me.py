@@ -125,18 +125,19 @@ class Trainer():
 
             pred_np = pred_choice.cpu().data.numpy()
             target_np = target.cpu().data.numpy()
-            print(pred_np)
-            print(target_np)
+
             for shape_idx in range(target_np.shape[0]):
                 parts = range(self.number_of_classes)#np.unique(target_np[shape_idx])
                 part_ious = []
                 for part in parts:
                     I = np.sum(np.logical_and(pred_np[shape_idx] == part, target_np[shape_idx] == part))
                     U = np.sum(np.logical_or(pred_np[shape_idx] == part, target_np[shape_idx] == part))
+                    print("==>",I , U)
                     if U == 0:
                         iou = 1 #If the union of groundtruth and prediction points is empty, then count part IoU as 1
                     else:
                         iou = I / float(U)
+                    print(iou)
                     part_ious.append(iou)
                 shape_ious.append(np.mean(part_ious))
         print("Mean IOU: ", np.mean(shape_ious))
