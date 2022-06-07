@@ -175,6 +175,7 @@ class Trainer():
             number_of_labels = np.amax(labels) + 1
             selected = np.zeros((tsne_embs_i.shape[1],1)).T
             labels_s = []
+            print(feat.shape)
 
             for i in range(number_of_labels):
                 selected= np.concatenate((selected,feat[labels == i][0:100]), axis=0)
