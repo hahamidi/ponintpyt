@@ -93,8 +93,10 @@ class Trainer():
 
                     accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
                     epoch_train_acc.append(accuracy)
-                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f' % (np.mean(epoch_train_loss),
-                                                                            np.mean(epoch_train_acc))))
+                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f' % (loss.cpu().item(),accuracy)))
+                print("Loss",np.mean(epoch_train_loss))
+                print("Accuracy",np.mean(epoch_train_acc))
+
                                                                         
     def val_one_epoch(self,epoch_num):
         epoch_val_loss = []
@@ -191,9 +193,10 @@ class Trainer():
                 self.load_model_optimizer(self.load_epoch)
 
             for epoch in range(self.epochs):
-                self.save_model_optimizer(epoch)
-                # self.train_one_epoch(epoch)
+                
+                self.train_one_epoch(epoch)
                 self.val_one_epoch(epoch)
+                self.save_model_optimizer(epoch)
 
                 
                 # self.scheduler.step()
