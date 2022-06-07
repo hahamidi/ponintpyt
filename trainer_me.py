@@ -67,7 +67,7 @@ class Trainer():
                     print(idx)
                     if idx == 0:
                         print("emm")
-                        self.show_embeddings(points, targets, title = str(epoch_num))
+                        self.show_embeddings(tsne_embs_i = points,lbls= targets, title = str(epoch_num))
                     if points.shape[0] <= 1:
                         continue
                     self.optimizer.zero_grad()
