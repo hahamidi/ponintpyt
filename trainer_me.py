@@ -188,7 +188,7 @@ def show_embedding_sklearn(tsne_embs_i, lbls,title = "", cmap=plt.cm.tab20,highl
     random_str = str(random.randint(0,1000000))
     plt.savefig("/./content/embed"+random_str+"-"+str(title)+'.png')
 
-    def train(self):
+def train(self):
         if self.load_model == True:
             self.load_model_optimizer(self.load_epoch)
 
