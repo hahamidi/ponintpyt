@@ -22,6 +22,10 @@ import matplotlib.pyplot as plt
 import random
 from pylab import cm
 
+dire = __file__.split('/')[:-1]
+dire = '/'.join(dire)
+
+
 class Trainer():
     def __init__(self,model,
                         train_data_loader, 
@@ -139,37 +143,16 @@ class Trainer():
         print("Loss",np.mean(epoch_val_loss))
         print("Accuracy",np.mean(epoch_val_acc))
         print("Mean IOU: ", np.mean(shape_ious))
-    # def evaluate_miou(self):
-    #      with tensorflow.device('/cpu:0'):
-    #             shape_ious = []
-    #             batch_iter = tqdm(enumerate(self.val_data_loader), 'Miou on val', total=len(self.val_data_loader),
-    #                             position=0)
-    #             m = MeanIoU(self.number_of_classes, name=None, dtype=None)
-    #             for i,data in batch_iter:
-    #                 points, target = data
-    #                 points, target = points.cuda(), target.cuda()
-    #                 classifier = self.model.eval()
-    #                 pred, _= classifier(points)
-    #                 pred_choice = pred.data.max(2)[1]
 
-    #                 pred_np = pred_choice.cpu().data.numpy()
-    #                 target_np = target.cpu().data.numpy()
-                    
-    #                 m.update_state(pred_np, target_np)
-    #                 part_ious = m.result().numpy()
-    #                 shape_ious.append(np.mean(part_ious))
-
-    #             print("Mean IOU: ", np.mean(shape_ious))
-    #             return np.mean(shape_ious)
 
     def save_model_optimizer(self,epoch_num):
-        torch.save(self.model.state_dict(), './checkpoints/model_epoch_' + str(epoch_num) + '.pth')
-        torch.save(self.optimizer.state_dict(), './checkpoints/optimizer_epoch_' + str(epoch_num) + '.pth')
+        torch.save(self.model.state_dict(), dire+'/checkpoints/model_epoch_' + str(epoch_num) + '.pth')
+        torch.save(self.optimizer.state_dict(),  dire+'/checkpoints/optimizer_epoch_' + str(epoch_num) + '.pth')
         print('Model and optimizer saved!')
 
     def load_model_optimizer(self,epoch_num):
-        self.model.load_state_dict(torch.load('./checkpoints/model_epoch_' + str(epoch_num) + '.pth'))
-        self.optimizer.load_state_dict(torch.load('./checkpoints/optimizer_epoch_' + str(epoch_num) + '.pth'))
+        self.model.load_state_dict(torch.load( dire+'/checkpoints/model_epoch_' + str(epoch_num) + '.pth'))
+        self.optimizer.load_state_dict(torch.load( dire+'/checkpoints/optimizer_epoch_' + str(epoch_num) + '.pth'))
         print('Model and optimizer loaded!')
 
     def show_embedding_sklearn(self,tsne_embs_i, lbls,title = "", cmap=plt.cm.tab20,highlight_lbls = None):
