@@ -162,8 +162,10 @@ class Trainer():
         print('Model and optimizer loaded!')
 
     def show_embedding_sklearn(self,tsne_embs_i, lbls,title = "", cmap=plt.cm.tab20,highlight_lbls = None):
-        
+            
             labels = lbls.flatten()
+            print(labels.shape)
+            print(tsne_embs_i.shape)
             feat = np.zeros((tsne_embs_i.shape[1],tsne_embs_i.shape[2])).T
 
             for b in tsne_embs_i:
