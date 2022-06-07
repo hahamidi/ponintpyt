@@ -17,6 +17,11 @@ from tqdm import tqdm
 import tensorflow
 from tensorflow.keras.metrics import MeanIoU
 
+from openTSNE import TSNE
+import matplotlib.pyplot as plt
+import random
+from pylab import cm
+
 class Trainer():
     def __init__(self,model,
                         train_data_loader, 
@@ -39,7 +44,7 @@ class Trainer():
 
         self.load_model = False
         self.load_epoch = 0
-        
+
         self.blue= lambda x: '\033[94m' + x + '\033[0m'
         self.red = lambda x: '\033[91m' + x + '\033[0m'
 
@@ -91,11 +96,14 @@ class Trainer():
         batch_iter = tqdm(enumerate(self.val_data_loader), 'Validation', total=len(self.val_data_loader),position=0)
         self.model = self.model.eval()
         for idx,data in batch_iter:
+
                     batch_number += 1
                     points, targets = data
                     # print(targets)
  
                     points, targets = points.to(self.device), targets.to(self.device)
+                    if idx == 0:
+                        self.show_embeddings(points, targets, title = str(epoch_num))
                     if points.shape[0] <= 1:
                         continue
 
@@ -150,6 +158,32 @@ class Trainer():
         self.model.load_state_dict(torch.load('./checkpoints/model_epoch_' + str(epoch_num) + '.pth'))
         self.optimizer.load_state_dict(torch.load('./checkpoints/optimizer_epoch_' + str(epoch_num) + '.pth'))
         print('Model and optimizer loaded!')
+
+    def show_embeddings(tsne_embs_i, lbls,title = "",highlight_lbls=None, imsize=8, cmap=plt.cm.tab20):
+        labels = lbls.flatten()
+        feat = np.zeros((tsne_embs_i.shape[1],tsne_embs_i.shape[2])).T
+        
+        for b in tsne_embs_i:
+            feat= np.concatenate((feat, b.T), axis=0)
+
+        feat= feat[tsne_embs_i.shape[2]: , :]
+        number_of_labels = np.amax(labels) + 1
+        selected = np.zeros((tsne_embs_i.shape[1],1)).T
+        labels_s = []
+        for i in range(number_of_labels):
+            selected= np.concatenate((selected,feat[labels == i][0:100]), axis=0)
+            labels_s= np.concatenate((labels_s,labels[labels == i][0:100]), axis=0)
+        selected = selected[1:]
+
+        tsne = TSNE(metric='cosine', n_jobs=-1)
+        tsne_embs = tsne.fit(selected)
+
+        fig,ax = plt.subplots(figsize=(imsize,imsize))
+
+        # colors = cmap(np.array(labels_s))
+        ax.scatter(tsne_embs[:,0], tsne_embs[:,1], c=labels_s, cmap=cmap, alpha=1 if highlight_lbls is None else 0.1)
+        random_str = str(random.randint(0,1000000))
+        plt.savefig("/./content/embed"+random_str+"-"+str(title)+'.png')
 
     def train(self):
         if self.load_model == True:
