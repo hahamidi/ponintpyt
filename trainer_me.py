@@ -161,45 +161,46 @@ class Trainer():
         self.optimizer.load_state_dict(torch.load('./checkpoints/optimizer_epoch_' + str(epoch_num) + '.pth'))
         print('Model and optimizer loaded!')
 
-def show_embedding_sklearn(tsne_embs_i, lbls,title = "", cmap=plt.cm.tab20,highlight_lbls = None):
-    print("a")
+    def show_embedding_sklearn(self,tsne_embs_i, lbls,title = "", cmap=plt.cm.tab20,highlight_lbls = None):
+        
+            labels = lbls.flatten()
+            feat = np.zeros((tsne_embs_i.shape[1],tsne_embs_i.shape[2])).T
 
-    labels = lbls.flatten()
-    feat = np.zeros((tsne_embs_i.shape[1],tsne_embs_i.shape[2])).T
-    print("a")
-    for b in tsne_embs_i:
-      feat= np.concatenate((feat, b.T), axis=0)
-    print("a")
-    feat= feat[tsne_embs_i.shape[2]: , :]
-    number_of_labels = np.amax(labels) + 1
-    selected = np.zeros((tsne_embs_i.shape[1],1)).T
-    labels_s = []
-    print("a")
-    for i in range(number_of_labels):
-      selected= np.concatenate((selected,feat[labels == i][0:100]), axis=0)
-      labels_s= np.concatenate((labels_s,labels[labels == i][0:100]), axis=0)
-    selected = selected[1:]
-    print("a")
-    tsne = sklearnTSNE(n_components=2, random_state=0)  # n_components means you mean to plot your dimensional data to 2D
-    x_test_2d = tsne.fit_transform(selected)
+            for b in tsne_embs_i:
+                feat= np.concatenate((feat, b.T), axis=0)
 
-    fig,ax = plt.subplots(figsize=(10,10))
-    ax.scatter(x_test_2d[:,0], x_test_2d[:,1], c=labels_s, cmap=cmap, alpha=1 if highlight_lbls is None else 0.1)
-    random_str = str(random.randint(0,1000000))
-    plt.savefig("/./content/embed"+random_str+"-"+str(title)+'.png')
+            feat= feat[tsne_embs_i.shape[2]: , :]
+            number_of_labels = np.amax(labels) + 1
+            selected = np.zeros((tsne_embs_i.shape[1],1)).T
+            labels_s = []
 
-def train(self):
-        if self.load_model == True:
-            self.load_model_optimizer(self.load_epoch)
+            for i in range(number_of_labels):
+                selected= np.concatenate((selected,feat[labels == i][0:100]), axis=0)
+                labels_s= np.concatenate((labels_s,labels[labels == i][0:100]), axis=0)
+            selected = selected[1:]
 
-        for epoch in range(self.epochs):
-            
-            self.train_one_epoch(epoch)
-            self.val_one_epoch(epoch)
-            self.evaluate_miou()
-            self.save_model_optimizer(epoch)
-            # self.scheduler.step()
-            # torch.save(self.model.state_dict(), 'model_%d.pkl' % epoch)
+            tsne = sklearnTSNE(n_components=2, random_state=0)  # n_components means you mean to plot your dimensional data to 2D
+            x_test_2d = tsne.fit_transform(selected)
+
+            fig,ax = plt.subplots(figsize=(10,10))
+            ax.scatter(x_test_2d[:,0], x_test_2d[:,1], c=labels_s, cmap=cmap, alpha=1 if highlight_lbls is None else 0.1)
+            random_str = str(random.randint(0,1000000))
+            plt.savefig("/./content/embed"+random_str+"-"+str(title)+'.png')
+
+
+
+    def train(self):
+            if self.load_model == True:
+                self.load_model_optimizer(self.load_epoch)
+
+            for epoch in range(self.epochs):
+                
+                self.train_one_epoch(epoch)
+                self.val_one_epoch(epoch)
+                self.evaluate_miou()
+                self.save_model_optimizer(epoch)
+                # self.scheduler.step()
+                # torch.save(self.model.state_dict(), 'model_%d.pkl' % epoch)
 
     
 
