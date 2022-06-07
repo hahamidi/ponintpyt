@@ -72,7 +72,7 @@ class Trainer():
                     self.model = self.model.train()
                     preds, feature_transform = self.model(points)
                     if idx == 0:
-                        show_embedding_sklearn((preds).cpu().detach().numpy(),targets.cpu().detach().numpy(),title = "train"+str(epoch_num))
+                        self.show_embedding_sklearn((preds).cpu().detach().numpy(),targets.cpu().detach().numpy(),title = "train"+str(epoch_num))
                     preds = preds.view(-1, self.number_of_classes)
                     targets = targets.view(-1)
 
