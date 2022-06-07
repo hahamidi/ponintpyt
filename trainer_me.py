@@ -105,43 +105,44 @@ class Trainer():
         shape_ious = []
         batch_iter = tqdm(enumerate(self.val_data_loader), 'Validation', total=len(self.val_data_loader),position=0)
         self.model = self.model.eval()
-        m = MeanIoU(self.number_of_classes, name=None, dtype=None)
-        for idx,data in batch_iter:
+        with tensorflow.device('/cpu:0'):
+            m = MeanIoU(self.number_of_classes, name=None, dtype=None)
+            for idx,data in batch_iter:
 
-                    batch_number += 1
-                    points, targets = data
-                    # print(targets)
- 
-                    points, targets = points.to(self.device), targets.to(self.device)
+                        batch_number += 1
+                        points, targets = data
+                        # print(targets)
+    
+                        points, targets = points.to(self.device), targets.to(self.device)
 
-                    if points.shape[0] <= 1:
-                        continue
+                        if points.shape[0] <= 1:
+                            continue
 
-                    
-                    preds, feature_transform = self.model(points)
-  
-                    preds = preds.view(-1, self.number_of_classes)
-                    targets = targets.view(-1)
+                        
+                        preds, feature_transform = self.model(points)
+    
+                        preds = preds.view(-1, self.number_of_classes)
+                        targets = targets.view(-1)
 
-                    identity = torch.eye(feature_transform.shape[-1]).to(self.device)
-                    regularization_loss = torch.norm(
-                        identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
-                    )
-                    loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
-                    epoch_val_loss.append(loss.cpu().item())
-                    preds = preds.data.max(1)[1]
-                    pred_np = preds.cpu().data.numpy()
-                    target_np = targets.cpu().data.numpy()
-                    m.update_state(pred_np, target_np)
-                    part_ious = m.result().numpy()
-                    shape_ious.append(np.mean(part_ious))
+                        identity = torch.eye(feature_transform.shape[-1]).to(self.device)
+                        regularization_loss = torch.norm(
+                            identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
+                        )
+                        loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
+                        epoch_val_loss.append(loss.cpu().item())
+                        preds = preds.data.max(1)[1]
+                        pred_np = preds.cpu().data.numpy()
+                        target_np = targets.cpu().data.numpy()
+                        m.update_state(pred_np, target_np)
+                        part_ious = m.result().numpy()
+                        shape_ious.append(np.mean(part_ious))
 
-                    corrects = preds.eq(targets.data).cpu().sum()
+                        corrects = preds.eq(targets.data).cpu().sum()
 
-                    accuracy = corrects.item() / float(self.val_data_loader.batch_size*2500)
-                    epoch_val_acc.append(accuracy)
-                    batch_iter.set_description(self.red('val loss: %f, val accuracy: %f,MIou %f' % (loss.cpu().item(),
-                                                                            accuracy,np.mean(part_ious))))
+                        accuracy = corrects.item() / float(self.val_data_loader.batch_size*2500)
+                        epoch_val_acc.append(accuracy)
+                        batch_iter.set_description(self.red('val loss: %f, val accuracy: %f,MIou %f' % (loss.cpu().item(),
+                                                                                accuracy,np.mean(part_ious))))
         print("Loss",np.mean(epoch_val_loss))
         print("Accuracy",np.mean(epoch_val_acc))
         print("Mean IOU: ", np.mean(shape_ious))
