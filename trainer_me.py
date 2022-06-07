@@ -36,6 +36,10 @@ class Trainer():
         self.loss_function = loss_function
         self.scheduler = scheduler
         self.device = device
+
+        self.load_model = False
+        self.load_epoch = 0
+        
         self.blue= lambda x: '\033[94m' + x + '\033[0m'
         self.red = lambda x: '\033[91m' + x + '\033[0m'
 
@@ -133,15 +137,30 @@ class Trainer():
                     m.update_state(pred_np, target_np)
                     part_ious = m.result().numpy()
                     shape_ious.append(np.mean(part_ious))
+
                 print("Mean IOU: ", np.mean(shape_ious))
                 return np.mean(shape_ious)
 
+    def save_model_optimizer(self,epoch_num):
+        torch.save(self.model.state_dict(), './checkpoints/model_epoch_' + str(epoch_num) + '.pth')
+        torch.save(self.optimizer.state_dict(), './checkpoints/optimizer_epoch_' + str(epoch_num) + '.pth')
+        print('Model and optimizer saved!')
+
+    def load_model_optimizer(self,epoch_num):
+        self.model.load_state_dict(torch.load('./checkpoints/model_epoch_' + str(epoch_num) + '.pth'))
+        self.optimizer.load_state_dict(torch.load('./checkpoints/optimizer_epoch_' + str(epoch_num) + '.pth'))
+        print('Model and optimizer loaded!')
 
     def train(self):
+        if self.load_model == True:
+            self.load_model_optimizer(self.load_epoch)
+
         for epoch in range(self.epochs):
-            self.evaluate_miou()
+            
             self.train_one_epoch(epoch)
             self.val_one_epoch(epoch)
+            self.evaluate_miou()
+            self.save_model_optimizer(epoch)
             # self.scheduler.step()
             # torch.save(self.model.state_dict(), 'model_%d.pkl' % epoch)
 
@@ -212,6 +231,10 @@ if __name__ == '__main__':
                         device =device)
     print(train_dataset.NUM_SEGMENTATION_CLASSES)
     trainer.train()
+
+
+
+
 
 
 
