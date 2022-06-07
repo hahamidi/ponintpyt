@@ -191,11 +191,11 @@ class Trainer():
                 self.load_model_optimizer(self.load_epoch)
 
             for epoch in range(self.epochs):
-                
+                self.save_model_optimizer(epoch)
                 # self.train_one_epoch(epoch)
                 self.val_one_epoch(epoch)
 
-                self.save_model_optimizer(epoch)
+                
                 # self.scheduler.step()
                 # torch.save(self.model.state_dict(), 'model_%d.pkl' % epoch)
 
