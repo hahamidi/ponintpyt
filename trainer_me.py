@@ -102,7 +102,9 @@ class Trainer():
                     # print(targets)
  
                     points, targets = points.to(self.device), targets.to(self.device)
+                    print(idx)
                     if idx == 0:
+                        print("emm")
                         self.show_embeddings(points, targets, title = str(epoch_num))
                     if points.shape[0] <= 1:
                         continue
