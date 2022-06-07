@@ -96,8 +96,10 @@ class Trainer():
         epoch_val_loss = []
         epoch_val_acc = []
         batch_number = 0
+        shape_ious = []
         batch_iter = tqdm(enumerate(self.val_data_loader), 'Validation', total=len(self.val_data_loader),position=0)
         self.model = self.model.eval()
+        m = MeanIoU(self.number_of_classes, name=None, dtype=None)
         for idx,data in batch_iter:
 
                     batch_number += 1
@@ -122,34 +124,43 @@ class Trainer():
                     loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
                     epoch_val_loss.append(loss.cpu().item())
                     preds = preds.data.max(1)[1]
-                    corrects = preds.eq(targets.data).cpu().sum()
-
-                    accuracy = corrects.item() / float(self.val_data_loader.batch_size*2500)
-                    epoch_val_acc.append(accuracy)
-                    batch_iter.set_description(self.red('val loss: %f, val accuracy: %f' % (np.mean(epoch_val_loss),
-                                                                            np.mean(epoch_val_acc))))
-    def evaluate_miou(self):
-         with tensorflow.device('/cpu:0'):
-                shape_ious = []
-                batch_iter = tqdm(enumerate(self.val_data_loader), 'Miou on val', total=len(self.val_data_loader),
-                                position=0)
-                m = MeanIoU(self.number_of_classes, name=None, dtype=None)
-                for i,data in batch_iter:
-                    points, target = data
-                    points, target = points.cuda(), target.cuda()
-                    classifier = self.model.eval()
-                    pred, _= classifier(points)
-                    pred_choice = pred.data.max(2)[1]
-
-                    pred_np = pred_choice.cpu().data.numpy()
-                    target_np = target.cpu().data.numpy()
-                    
+                    pred_np = preds.cpu().data.numpy()
+                    target_np = targets.cpu().data.numpy()
                     m.update_state(pred_np, target_np)
                     part_ious = m.result().numpy()
                     shape_ious.append(np.mean(part_ious))
 
-                print("Mean IOU: ", np.mean(shape_ious))
-                return np.mean(shape_ious)
+                    corrects = preds.eq(targets.data).cpu().sum()
+
+                    accuracy = corrects.item() / float(self.val_data_loader.batch_size*2500)
+                    epoch_val_acc.append(accuracy)
+                    batch_iter.set_description(self.red('val loss: %f, val accuracy: %f,MIou %f' % (loss.cpu().item(),
+                                                                            accuracy,np.mean(part_ious))))
+        print("Loss",np.mean(epoch_val_loss))
+        print("Accuracy",np.mean(epoch_val_acc))
+        print("Mean IOU: ", np.mean(shape_ious))
+    # def evaluate_miou(self):
+    #      with tensorflow.device('/cpu:0'):
+    #             shape_ious = []
+    #             batch_iter = tqdm(enumerate(self.val_data_loader), 'Miou on val', total=len(self.val_data_loader),
+    #                             position=0)
+    #             m = MeanIoU(self.number_of_classes, name=None, dtype=None)
+    #             for i,data in batch_iter:
+    #                 points, target = data
+    #                 points, target = points.cuda(), target.cuda()
+    #                 classifier = self.model.eval()
+    #                 pred, _= classifier(points)
+    #                 pred_choice = pred.data.max(2)[1]
+
+    #                 pred_np = pred_choice.cpu().data.numpy()
+    #                 target_np = target.cpu().data.numpy()
+                    
+    #                 m.update_state(pred_np, target_np)
+    #                 part_ious = m.result().numpy()
+    #                 shape_ious.append(np.mean(part_ious))
+
+    #             print("Mean IOU: ", np.mean(shape_ious))
+    #             return np.mean(shape_ious)
 
     def save_model_optimizer(self,epoch_num):
         torch.save(self.model.state_dict(), './checkpoints/model_epoch_' + str(epoch_num) + '.pth')
@@ -198,9 +209,9 @@ class Trainer():
 
             for epoch in range(self.epochs):
                 
-                self.train_one_epoch(epoch)
+                # self.train_one_epoch(epoch)
                 self.val_one_epoch(epoch)
-                self.evaluate_miou()
+
                 self.save_model_optimizer(epoch)
                 # self.scheduler.step()
                 # torch.save(self.model.state_dict(), 'model_%d.pkl' % epoch)
