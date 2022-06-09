@@ -170,7 +170,7 @@ class SegmentationPointNet_contrast(nn.Module):
         x = F.relu(self.bn_1(self.conv_1(x)))
         x = F.relu(self.bn_2(self.conv_2(x)))
         x = F.relu(self.bn_3(self.conv_3(x)))
-        print(x.shape)
+        # print(x.shape)
         # x = self.conv_4(x)
         # x = x.transpose(2, 1)
 
