@@ -65,6 +65,7 @@ class Trainer():
                 batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
                                 position=0)
                 self.model = self.model.train()
+                contrast_loss = Contrast_loss_point_cloud()
                 for idx,data in batch_iter:
                     batch_number += 1
                     points, targets = data
@@ -89,7 +90,7 @@ class Trainer():
                     # )
                     print(preds.shape)
                     print(targets.shape)
-                    loss = Contrast_loss_point_cloud(preds, targets) # + 0.001 * regularization_loss
+                    loss = contrast_loss(preds, targets) # + 0.001 * regularization_loss
                     epoch_train_loss.append(loss.cpu().item())
                     loss.backward()
                     self.optimizer.step()
