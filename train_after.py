@@ -202,7 +202,7 @@ class Trainer():
 
 
     def train(self):
-            self.freeze_all_except_last_layer()
+            # self.freeze_all_except_last_layer()
             if self.load_model == True:
                 self.load_model_optimizer(self.load_epoch)
 

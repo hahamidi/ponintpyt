@@ -183,6 +183,8 @@ class SegmentationPointNet_contrast_with_head(nn.Module):
     def __init__(self,model_bc, num_classes, point_dimension=3):
         super(SegmentationPointNet_contrast_with_head, self).__init__()
         self.model_back_bone = model_bc
+        for param in self.model_back_bone.parameters():
+            param.requires_grad = False
         self.conv_4 = nn.Conv1d(128, num_classes, 1)
 
 
