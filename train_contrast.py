@@ -22,6 +22,7 @@ from sklearn.manifold import TSNE as sklearnTSNE
 import matplotlib.pyplot as plt
 import random
 from pylab import cm
+from custom_loss import Contrast_loss_point_cloud, Contrast_loss_point_cloud_inetra_batch
 
 dire = __file__.split('/')[:-1]
 dire = '/'.join(dire)
@@ -59,16 +60,17 @@ class Trainer():
     def train_one_epoch(self,epoch_num):
 
                 epoch_train_loss = []
-                epoch_train_acc = []
+                # epoch_train_acc = []
                 batch_number = 0
                 batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
                                 position=0)
+                self.model = self.model.train()
                 for idx,data in batch_iter:
                     batch_number += 1
                     points, targets = data
                     # print(targets)
  
-                    points, targets = points.to(self.device), targets.to(self.device)
+                    points, targets = points.to(self.device)
   
 
                     if points.shape[0] <= 1:
@@ -78,25 +80,25 @@ class Trainer():
                     preds, feature_transform = self.model(points)
                     # if idx == 0:
                     #     self.show_embedding_sklearn((preds).cpu().detach().numpy(),targets.cpu().detach().numpy(),title = "train"+str(epoch_num))
-                    preds = preds.view(-1, self.number_of_classes)
-                    targets = targets.view(-1)
+                    # preds = preds.view(-1, self.number_of_classes)
+                    # targets = targets.view(-1)
 
-                    identity = torch.eye(feature_transform.shape[-1]).to(self.device)
-                    regularization_loss = torch.norm(
-                        identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
-                    )
-                    loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
+                    # identity = torch.eye(feature_transform.shape[-1]).to(self.device)
+                    # regularization_loss = torch.norm(
+                    #     identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
+                    # )
+                    loss = Contrast_loss_point_cloud(preds, targets) # + 0.001 * regularization_loss
                     epoch_train_loss.append(loss.cpu().item())
                     loss.backward()
                     self.optimizer.step()
-                    preds = preds.data.max(1)[1]
-                    corrects = preds.eq(targets.data).cpu().sum()
+                    # preds = preds.data.max(1)[1]
+                    # corrects = preds.eq(targets.data).cpu().sum()
 
-                    accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
-                    epoch_train_acc.append(accuracy)
-                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f' % (loss.cpu().item(),accuracy)))
+                    # accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
+                    # epoch_train_acc.append(accuracy)
+                    batch_iter.set_description(self.blue('train loss: %f' % (loss.cpu().item())))
                 print("Loss",np.mean(epoch_train_loss))
-                print("Accuracy",np.mean(epoch_train_acc))
+                # print("Accuracy",np.mean(epoch_train_acc))
 
                                                                         
     def val_one_epoch(self,epoch_num):
@@ -197,7 +199,7 @@ class Trainer():
             for epoch in range(self.epochs):
                 
                 self.train_one_epoch(epoch)
-                self.val_one_epoch(epoch)
+                # self.val_one_epoch(epoch)
                 self.save_model_optimizer(epoch)
 
                 
