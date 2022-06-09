@@ -64,7 +64,7 @@ class Trainer():
                 batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
                                 position=0)
                 self.model = self.model.train()
-                contrast_loss = Contrast_loss_point_cloud_inetra_batch()
+                contrast_loss = Contrast_loss_point_cloud()
                 for idx,data in batch_iter:
                     batch_number += 1
                     points, targets = data
@@ -110,7 +110,7 @@ class Trainer():
         shape_ious = []
         batch_iter = tqdm(enumerate(self.val_data_loader), 'Validation', total=len(self.val_data_loader),position=0)
         self.model = self.model.eval()
-        contrast_loss = Contrast_loss_point_cloud_inetra_batch()
+        contrast_loss = Contrast_loss_point_cloud()
         with tensorflow.device('/cpu:0'):
             m = MeanIoU(self.number_of_classes, name=None, dtype=None)
             for idx,data in batch_iter:
