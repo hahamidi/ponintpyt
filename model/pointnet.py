@@ -148,30 +148,18 @@ class SegmentationPointNet(nn.Module):
         return F.log_softmax(x, dim=-1), feature_transform
 
 
-class SegmentationPointNet_contrast(nn.Module):
+class SegmentationPointNet_contrast_with_head(nn.Module):
 
-    def __init__(self, num_classes, point_dimension=3):
-        super(SegmentationPointNet_contrast, self).__init__()
-        self.base_pointnet = BasePointNet(return_local_features=True, point_dimension=point_dimension)
+    def __init__(self,model_bc, num_classes, point_dimension=3):
+        super(SegmentationPointNet_contrast_with_head, self).__init__()
+        self.model_back_bone = model_bc
+        self.conv_4 = nn.Conv1d(128, num_classes, 1)
 
-        self.conv_1 = nn.Conv1d(1088, 512, 1)
-        self.conv_2 = nn.Conv1d(512, 256, 1)
-        self.conv_3 = nn.Conv1d(256, 128, 1)
-        # self.conv_4 = nn.Conv1d(128, num_classes, 1)
 
-        self.bn_1 = nn.BatchNorm1d(512)
-        self.bn_2 = nn.BatchNorm1d(256)
-        self.bn_3 = nn.BatchNorm1d(128)
 
     def forward(self, x):
-        x, feature_transform = self.base_pointnet(x)
-
+        x, feature_transform = self.model_back_bone(x)
+        x = self.conv_4(x)
         x = x.transpose(2, 1)
-        x = F.relu(self.bn_1(self.conv_1(x)))
-        x = F.relu(self.bn_2(self.conv_2(x)))
-        x = F.relu(self.bn_3(self.conv_3(x)))
-        # print(x.shape)
-        # x = self.conv_4(x)
-        # x = x.transpose(2, 1)
 
-        return x, feature_transform
+        return F.log_softmax(x, dim=-1), feature_transform
