@@ -62,6 +62,7 @@ class Trainer():
                 batch_number = 0
                 batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
                                 position=0)
+                self.model = self.model.train()
                 for idx,data in batch_iter:
                     batch_number += 1
                     points, targets = data
@@ -73,7 +74,7 @@ class Trainer():
                     if points.shape[0] <= 1:
                         continue
                     self.optimizer.zero_grad()
-                    self.model = self.model.train()
+                    
                     preds, feature_transform = self.model(points)
                     # if idx == 0:
                     #     self.show_embedding_sklearn((preds).cpu().detach().numpy(),targets.cpu().detach().numpy(),title = "train"+str(epoch_num))
