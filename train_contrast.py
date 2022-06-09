@@ -87,6 +87,8 @@ class Trainer():
                     # regularization_loss = torch.norm(
                     #     identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
                     # )
+                    print(preds.shape)
+                    print(targets.shape)
                     loss = Contrast_loss_point_cloud(preds, targets) # + 0.001 * regularization_loss
                     epoch_train_loss.append(loss.cpu().item())
                     loss.backward()
