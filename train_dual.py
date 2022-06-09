@@ -232,7 +232,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     MODELS = {
                 'classification': ClassificationPointNet,
-                'segmentation': SegmentationPointNet
+                'segmentation': SegmentationPointNet_Dual
             }
 
     DATASETS = {
