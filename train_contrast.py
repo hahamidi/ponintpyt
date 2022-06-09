@@ -70,7 +70,7 @@ class Trainer():
                     points, targets = data
                     # print(targets)
  
-                    points, targets = points.to(self.device)
+                    points, targets = points.to(self.device), targets.to(self.device)
   
 
                     if points.shape[0] <= 1:
