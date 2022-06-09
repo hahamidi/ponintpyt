@@ -268,7 +268,7 @@ if __name__ == '__main__':
     model_back_bone.load_state_dict(torch.load( dire+'/checkpoints/model_epoch_' + model_name + '.pth'))
 
     if args.task == 'segmentation':
-            model = SegmentationPointNet_contrast_with_head(model =model_back_bone ,num_classes=train_dataset.NUM_SEGMENTATION_CLASSES,
+            model = SegmentationPointNet_contrast_with_head(model_bc =model_back_bone ,num_classes=train_dataset.NUM_SEGMENTATION_CLASSES,
                                      point_dimension=train_dataset.POINT_DIMENSION)
     else:
                 raise Exception('Unknown task !')
