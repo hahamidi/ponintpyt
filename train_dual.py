@@ -98,7 +98,7 @@ class Trainer():
 
                     accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
                     epoch_train_acc.append(accuracy)
-                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f , loss c %f loss en %f' % (loss.cpu().item(),accuracy,loss1.cpu().item(),loss2.cpu().item())))
+                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f , loss c %f loss en %f' % (loss.cpu().item(),accuracy,loss2.cpu().item(),loss1.cpu().item())))
                 print("Loss",np.mean(epoch_train_loss))
                 print("Accuracy",np.mean(epoch_train_acc))
 
