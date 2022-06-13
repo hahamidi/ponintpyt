@@ -98,7 +98,7 @@ class Trainer():
 
                     accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
                     epoch_train_acc.append(accuracy)
-                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f' % (loss.cpu().item(),accuracy)))
+                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f , loss c %f loss en %f' % (loss.cpu().item(),accuracy,loss1.cpu().item(),loss2.cpu().item())))
                 print("Loss",np.mean(epoch_train_loss))
                 print("Accuracy",np.mean(epoch_train_acc))
 
@@ -267,6 +267,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
     print(device)
+    
     trainer = Trainer(model = model,
                         train_data_loader = train_dataloader, 
                         val_data_loader = test_dataloader, 
@@ -276,6 +277,7 @@ if __name__ == '__main__':
                         loss_function = F.cross_entropy,
                         scheduler = None,
                         device =device)
+
     print(train_dataset.NUM_SEGMENTATION_CLASSES)
     trainer.train()
 
