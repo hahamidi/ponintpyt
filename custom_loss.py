@@ -109,10 +109,10 @@ class Contrast_loss_point_cloud_inetra_batch(nn.Module):
 
 
             posetives = (mask * dot_products).sum(1) 
-            negetives = (mask_not * dot_products).sum(1)
+            negetives = (dot_products).sum(1)
 
                 
-            diviation = posetives / (posetives + negetives)
+            diviation = posetives / (negetives)
 
             #     # print(diviation)
                 
@@ -125,7 +125,7 @@ class Contrast_loss_point_cloud_inetra_batch(nn.Module):
             #     # print("------------------------------------------")
             if torch.isinf(loss) == False and torch.isnan(loss) == False:
 
-                    return torch.mean(loss)
+                    return torch.sum(loss)
             else:
                     print("inf or nan loss founded")
                     loss = 0
