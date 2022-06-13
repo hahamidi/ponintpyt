@@ -27,14 +27,14 @@ class Contrast_loss_point_cloud(nn.Module):
                 dot_products = dot_products - torch.diag(torch.diagonal(dot_products, 0))
 
                 mask = torch.eq(labels, labels.T).float()
-                mask_not = torch.logical_not(mask)
+                # mask_not = torch.logical_not(mask)
 
 
                 posetives = (mask * dot_products).sum(1) 
-                negetives = (mask_not * dot_products).sum(1)
+                negetives = (dot_products).sum(1)
                 # print(posetives,negetives)
 
-                diviation = posetives / (posetives + negetives)
+                diviation = posetives / (negetives)
                 # print(diviation)
                 
                 diviation = - torch.log(diviation)
@@ -49,7 +49,7 @@ class Contrast_loss_point_cloud(nn.Module):
                     print("inf or nan loss founded")
             all_loss = torch.stack(all_loss)
             # print(all_loss)
-            return torch.mean(all_loss)
+            return torch.sum(all_loss)
 
 
 
