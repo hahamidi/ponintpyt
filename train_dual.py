@@ -89,7 +89,7 @@ class Trainer():
                         identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
                     )
                     loss1 = F.nll_loss(preds, targets) + 0.001 * regularization_loss
-                    loss = loss1+ (loss2 * 3)
+                    loss = (loss1 * 3)+ (loss2)
                     epoch_train_loss.append(loss.cpu().item())
                     loss.backward()
                     self.optimizer.step()
@@ -98,7 +98,7 @@ class Trainer():
 
                     accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
                     epoch_train_acc.append(accuracy)
-                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f , loss c %f loss en %f' % (loss.cpu().item(),accuracy,(loss2.cpu().item() * 3 ),loss1.cpu().item())))
+                    batch_iter.set_description(self.blue('train loss: %f, train accuracy: %f , loss c %f loss en %f' % (loss.cpu().item(),accuracy,(loss2.cpu().item()),(loss1.cpu().item() * 3 ))))
                 print("Loss",np.mean(epoch_train_loss))
                 print("Accuracy",np.mean(epoch_train_acc))
 
@@ -136,7 +136,7 @@ class Trainer():
                             identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
                         )
                         loss1 = F.nll_loss(preds, targets) + 0.001 * regularization_loss
-                        loss = loss1+ (loss2 * 3)
+                        loss = (loss1 * 3)+ (loss2)
                         epoch_val_loss.append(loss.cpu().item())
                         preds = preds.data.max(1)[1]
                         pred_np = preds.cpu().data.numpy()
