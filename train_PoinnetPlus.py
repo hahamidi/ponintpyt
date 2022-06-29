@@ -5,7 +5,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from datasets import ShapeNetDataset, PointMNISTDataset
 from trainer_me import Trainer
-from model.DGCNN import DGCNN_partseg
+from model.pointnetPlus import PointNet2SemSegSSG
 
 
 
@@ -14,6 +14,9 @@ from model.DGCNN import DGCNN_partseg
 
     
 if __name__ == '__main__':
+    hypers = {'gpus': [0], 'optimizer': {'weight_decay': 0.0, 'lr': 0.001, 'lr_decay': 0.5, 'bn_momentum': 0.5, 'bnm_decay': 0.5,
+ 'decay_step': 300000.0}, 'task_model': {'class': 'model_ssg.PointNet2SemSegSSG', 'name': 'sem-ssg'},
+  'model': {'use_xyz': True}, 'distrib_backend': 'dp', 'num_points': 4096, 'epochs': 50, 'batch_size': 24}
     parser = argparse.ArgumentParser()
     parser.add_argument('dataset', type=str, choices=['shapenet', 'mnist'], help='dataset to train on')
     parser.add_argument('dataset_folder', type=str, help='path to the dataset folder')
@@ -26,8 +29,8 @@ if __name__ == '__main__':
     parser.add_argument('--model_checkpoint', type=str, default='', help='model checkpoint path')
     parser.add_argument('--num_points', type=int, default=2048,help='num of points to use')
     parser.add_argument('--dropout', type=float, default=0.5,help='dropout rate')
-    parser.add_argument('--emb_dims', type=int, default=1024, metavar='N',help='Dimension of embeddings')
-    parser.add_argument('--k', type=int, default=40, metavar='N',help='Num of nearest neighbors to use')
+    # parser.add_argument('--emb_dims', type=int, default=1024, metavar='N',help='Dimension of embeddings')
+    # parser.add_argument('--k', type=int, default=40, metavar='N',help='Num of nearest neighbors to use')
     print(1)
     args = parser.parse_args()
 
@@ -52,11 +55,11 @@ if __name__ == '__main__':
                                                         shuffle=True,
                                                         num_workers=args.number_of_workers)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = DGCNN_partseg(args, train_dataset.NUM_SEGMENTATION_CLASSES).to(device)
+    model = PointNet2SemSegSSG(hypers, train_dataset.NUM_SEGMENTATION_CLASSES).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     
     
-    print(device)
+
     
     trainer = Trainer(model = model,
                         train_data_loader = train_dataloader, 
