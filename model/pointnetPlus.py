@@ -2,7 +2,7 @@
 from turtle import forward
 import torch
 import torch.nn as nn
-from pointnet2_ops_lib.pointnet2_ops.pointnet2_modules import PointnetFPModule, PointnetSAModule
+from model.pointnet2_ops_lib.pointnet2_ops.pointnet2_modules import PointnetFPModule, PointnetSAModule
 
 print(PointnetFPModule)
 
