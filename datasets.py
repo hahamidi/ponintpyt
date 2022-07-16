@@ -112,9 +112,11 @@ class ShapeNetDataset(data.Dataset):
                 segmentation_classes = segmentation_classes[sampling_indices]
             segmentation_classes = segmentation_classes + segmentation_classes_offset -1
             segmentation_classes = torch.from_numpy(segmentation_classes)
+            print(point_cloud, segmentation_classes)
             return point_cloud, segmentation_classes
         elif point_cloud_class is not None:
             point_cloud_class = torch.tensor(point_cloud_class)
+            
             return point_cloud, point_cloud_class
         else:
             return point_cloud
