@@ -605,7 +605,9 @@ def generate_point_cloud(number_of_point_down_sample = 3000):
 # print('Time: ', stop - start)    
     
 class ShapeNetDataset(data.Dataset):
+    NUM_CLASSIFICATION_CLASSES = 16
     NUM_SEGMENTATION_CLASSES = 22
+
     POINT_DIMENSION = 3
 
 
