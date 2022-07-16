@@ -2,7 +2,8 @@ import open3d as o3d
 import numpy as np
 import random
 import torch.utils.data as data
-
+import warnings
+warnings.filterwarnings("ignore")
 def convert_to_point_cloud(mesh,number_of_point_per_meter=50):
     mesh.compute_vertex_normals()
     mesh.paint_uniform_color([0.1, 0.1, 0.7]) 
@@ -512,9 +513,12 @@ def concate_pc_to_base(base_pc,pc_list,base_number,shapes_side_numbers):
         base_pc , rand_p_source , rand_n_source, p_normal_source =random_point(base_pc,[1,0,0])
         pc , rand_p_attach , rand_n_attach, p_normal_attach =random_point(pc,[1,0,0])
         
-        noise = (np.random.rand(1,3) /10)[0]
-        angles = np.arccos(p_normal_source)+noise
-        
+        noise = (np.random.rand(1,3) /20)[0]
+        angles = np.arccos(p_normal_source ) + noise
+        array_sum = np.sum(angles)
+        array_has_nan = np.isnan(array_sum)
+        if array_has_nan :
+           angles = np.random.rand(1,3)[0]
         RO = pc.get_rotation_matrix_from_xyz((angles[0],angles[1],angles[2]))
         pc = pc.rotate(RO, center=(0,0,0))
         
@@ -572,16 +576,23 @@ def concate_pc_to_base(base_pc,pc_list,base_number,shapes_side_numbers):
        
 def generate_point_cloud(number_of_point_down_sample = 3000):        
     base_number = random.randint(1,22)
-    number_of_shaps = random.randint(1,7)
+    number_of_shaps = random.randint(1,4)
     shapes_side_numbers = []
     for _ in range(number_of_shaps):
         shapes_side_numbers.append(random.randint(1,22))
-    base_shape = return_random_shape(shapes=[base_number],point_per_meter=500)[0] 
-    sides      =    return_random_shape(shapes= shapes_side_numbers,point_per_meter=500)
+    base_shape = return_random_shape(shapes=[base_number],point_per_meter=2000)[0] 
+    sides      =    return_random_shape(shapes= shapes_side_numbers,point_per_meter=2000)
     pc , labels= concate_pc_to_base(base_shape,sides,base_number,shapes_side_numbers)
     points = np.array(pc.points)
-#     print(points.shape,labels.shape)
-    idx = np.random.choice(np.arange(len(points)), number_of_point_down_sample, replace=False)
+#     print(points.shape,labels.shape) 
+
+    try:
+      idx = np.random.choice(np.arange(len(points)), number_of_point_down_sample, replace=False)
+    except:
+      print("less point")
+      print(len(points))
+      idx = np.random.choice(np.arange(len(points)), number_of_point_down_sample, replace=True)
+
     points = points[idx]
     labels = labels[idx]
    
@@ -633,14 +644,17 @@ class ShapeNetDataset(data.Dataset):
 
         points , labels = generate_point_cloud(number_of_point_down_sample = self.number_of_points)
         points = np.round(points, 8)
-      
+        labels = labels - 1 
 
         return points.astype(np.float32),labels.astype(np.int64)
 
 
 
     def __len__(self):
-        return self.number_of_data
+      if self.train == True:
+           return 256
+      else:
+        return 100
 
 
     
