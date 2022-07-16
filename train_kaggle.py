@@ -64,7 +64,7 @@ class Trainer():
                 batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
                                 position=0)
                 self.model = self.model.train()
-                for idx,data in batch_iter:
+                for data in self.train_data_loader:
                     batch_number += 1
                     points, targets = data
                     # print(targets)
