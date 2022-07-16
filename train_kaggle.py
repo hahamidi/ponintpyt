@@ -61,8 +61,8 @@ class Trainer():
                 epoch_train_loss = []
                 epoch_train_acc = []
                 batch_number = 0
-                batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
-                                position=0)
+                # batch_iter = tqdm(enumerate(self.train_data_loader), 'Training', total=len(self.train_data_loader),
+                #                 position=0)
                 self.model = self.model.train()
                 for data in self.train_data_loader:
                     batch_number += 1
