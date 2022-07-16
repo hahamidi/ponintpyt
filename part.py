@@ -610,12 +610,21 @@ class ShapeNetPart(data.Dataset):
 
 
 
-    def __init__(self,partition = 'trainval',number_of_data = 10000,num_points=2500,class_choice = []):
+    def __init__(self,
+                 dataset_folder,
+                 number_of_points=2500,
+                 task='classification',
+                 train=True):
+            self.dataset_folder = dataset_folder
+            self.number_of_points = number_of_points
+            assert task in ['classification', 'segmentation']
+            self.task = task
+            self.train = train
 
-        self.number_of_points = num_points
-        self.number_of_data = number_of_data
-        self.seg_num_all = 22
-        self.seg_start_index = 0
+            # self.number_of_points = num_points
+            # self.number_of_data = number_of_data
+            # self.seg_num_all = 22
+            # self.seg_start_index = 0
 
 
     def __getitem__(self, index):
@@ -624,7 +633,7 @@ class ShapeNetPart(data.Dataset):
         points = np.round(points, 8)
       
 
-        return points.astype(np.float32),np.array([random.randint(0,15)]).astype(np.int64),labels.astype(np.int64)
+        return points.astype(np.float32),labels.astype(np.int64)
 
 
 
